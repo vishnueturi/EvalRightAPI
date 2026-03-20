@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using EvalRightAPI.Models;
 
 namespace EvalRightAPI.Controllers
 {
@@ -35,34 +36,16 @@ namespace EvalRightAPI.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> Post([FromBody] BusinessVerificationRequest requestModel)
         {
             try
             {
-                using var reader = new StreamReader(Request.Body, Encoding.UTF8);
-                var rawBody = await reader.ReadToEndAsync();
-
-                if (string.IsNullOrWhiteSpace(rawBody))
+                if (requestModel == null)
                     return BadRequest("Request body is required.");
 
-                // Validate and normalize JSON so we always forward valid JSON to Equifax.
-                // This mirrors the Node.js wrapper behavior (JSON.stringify(req.body)).
-                string bodyToSend;
-                JsonElement incomingJson;
-                try
-                {
-                    using var doc = JsonDocument.Parse(rawBody);
-                    incomingJson = doc.RootElement.Clone();
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogWarning(ex, "Invalid JSON in request body");
-                    return BadRequest(new { error = "Invalid JSON", detail = ex.Message });
-                }
-                                
-                // Re-serialize JSON to ensure consistent formatting and remove any stray comments/trailing commas
-                bodyToSend = JsonSerializer.Serialize(incomingJson);
-                
+                // Serialize the model to JSON for forwarding to Equifax
+                var bodyToSend = JsonSerializer.Serialize(requestModel, new JsonSerializerOptions { IgnoreNullValues = true });
+
                 var accessToken = await GetEquifaxAccessTokenAsync();
                 if (string.IsNullOrWhiteSpace(accessToken))
                 {
