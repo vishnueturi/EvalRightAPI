@@ -1,0 +1,16 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "Equifax": {
+    "TokenUrl": "https://api.sandbox.equifax.com/v2/oauth/token",
+    "TokenScope": "https://api.equifax.com/business/verification/v1",
+    "ClientId": "YOUR-CLIENT-ID-HERE",
+    "ClientSecret": "YOUR-CLIENT-SECRET-HERE",
+    "InquiryMemberNumber": "OPTIONAL-INQUIRY-NUMBER",
+    "BusinessVerificationUrl": "https://api.sandbox.equifax.com/business/verification/v1/business-verification"
+  }
+}
